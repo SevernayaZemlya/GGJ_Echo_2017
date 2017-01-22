@@ -38,4 +38,26 @@ public class PlayerMovement : MonoBehaviour {
 		playerRigidbody.MovePosition (transform.position + movement);
 	}
 
+	void OnTriggerEnter (Collider other) 
+	{
+		 if (other.gameObject.tag == "Food") 
+		{
+			other.gameObject.SetActive (false);
+			//play nom sound
+			//count = count + 1; ?
+			//SetCountText ();
+		}
+	}
+
+	void SetCountText ()
+	{
+	/*
+		countText.text = "Count: " + count.ToString ();
+		if (count >= 21) 
+		{
+			winText.text = "You WIN!";
+		}
+		*/
+	}
+
 }
