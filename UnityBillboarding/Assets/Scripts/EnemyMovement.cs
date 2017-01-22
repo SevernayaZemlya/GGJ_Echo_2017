@@ -11,8 +11,12 @@ public class EnemyMovement : MonoBehaviour {
 
 	public float m_MoveSpeed = 3.0f;
 	public float m_RotationSpeed = 3.0f;
+	public float m_PulseTimer = 5.0f;
+	private float m_PulseTimerCurrent;
 
-	//public int m_ChaseTimer = 5;
+	public AudioSource m_ChaseMusic;
+	public AudioSource m_EchoMonster;
+
 
 	bool m_PlayerDetected = true;
 	bool m_AtTarget = true;
@@ -20,6 +24,7 @@ public class EnemyMovement : MonoBehaviour {
 	void Awake(){
 
 		m_MyLocation = transform; //cache transform data for easy access/preformance
+		m_PulseTimerCurrent = m_PulseTimer;
     }
 
 
@@ -33,21 +38,20 @@ public class EnemyMovement : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
-
-		// if player pings enemy
-		// m_PlayerDetected = true;
-		// attack sound
-		// chase music
-		// start chase timer
-
-		//Pulse function on pulse_timer
-
-		// if chase timer <= 0 and player is hidden
-		// m_PlayerDetected = false;
-
-
 		Move();
-		PlaySound();
+
+		PlayChaseSound();
+
+		if (m_PlayerDetected == false)
+		{
+			m_PulseTimerCurrent -= Time.deltaTime;
+		}
+
+		if (m_PulseTimerCurrent <= 0.0f)
+		{
+			Pulse();
+			m_PulseTimerCurrent = m_PulseTimer;
+		}
 		
 	}
 
@@ -75,7 +79,7 @@ public class EnemyMovement : MonoBehaviour {
 		if (m_PlayerDetected && m_TargetPosition != null && target_distance < 1)
 		{
 
-			//m_PlayerDetected = false;
+			m_PlayerDetected = false;
 			m_AtTarget = true;
 			Pulse();
 		}
@@ -88,19 +92,16 @@ public class EnemyMovement : MonoBehaviour {
 
 	}
 
-	void PlaySound()
+	void PlayChaseSound()
 	{
-		if (m_PlayerDetected)
+		if (m_PlayerDetected && !m_ChaseMusic.isPlaying)
 		{
-			//play chase music
+			m_ChaseMusic.Play();
 		}
 
-		else
+		if(!m_PlayerDetected)
 		{
-			Transform player_transform = GameObject.FindWithTag("Player").transform; //target the player
-
-			float player_distance = (m_MyLocation.position - player_transform.position).magnitude;
-			//play with delay						
+			m_ChaseMusic.Pause();
 		}
 
 	}
@@ -109,9 +110,13 @@ public class EnemyMovement : MonoBehaviour {
 	{
 		m_PlayerDetected = false;
 
+		// Pulse effects
+		// Pulse sound
 		// if enemy pings player
-		// m_PlayerDetected = true;
+		// then m_PlayerDetected = true;
 	}
+
+
 
 
 }
