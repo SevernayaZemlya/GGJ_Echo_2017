@@ -45,6 +45,15 @@ public class EnemyMovement : MonoBehaviour {
 		// if chase timer <= 0 and player is hidden
 		// m_PlayerDetected = false;
 
+
+		Move();
+		PlaySound();
+		
+	}
+
+	void Move()
+	{
+
 		if (m_PlayerDetected)
 		{
 			
@@ -68,20 +77,38 @@ public class EnemyMovement : MonoBehaviour {
 
 			//m_PlayerDetected = false;
 			m_AtTarget = true;
+			Pulse();
 		}
-
-
-
 		else 
 		{
 			// sniff around for player
 			// wander around, aimlessly
 		}
-		
+
+
 	}
 
-	void Pulse () {
+	void PlaySound()
+	{
+		if (m_PlayerDetected)
+		{
+			//play chase music
+		}
+
+		else
+		{
+			//play with delay						
+		}
+
+	}
+
+	void Pulse () 
+	{
+		m_PlayerDetected = false;
+
 		// if enemy pings player
 		// m_PlayerDetected = true;
 	}
+
+
 }

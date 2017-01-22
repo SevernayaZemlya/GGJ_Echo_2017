@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour {
 	public Text countText;
 	public Text winText;
 	private int count;
+	private bool isMoving;
 	
 	void Awake ()
 	{
@@ -22,6 +23,7 @@ public class PlayerMovement : MonoBehaviour {
 		// Set up references.
 		playerRigidbody = GetComponent <Rigidbody> ();
 		m_MovementSound.Pause();
+		isMoving = false;
 
 		count = 0;
 		//m_MovementSound.loop = true;
@@ -37,18 +39,11 @@ public class PlayerMovement : MonoBehaviour {
 		// Move the player around the scene.
 		Move (h, v);
 
+		PlayMovementSound(h, v);
 
-		if (playerRigidbody.velocity.magnitude > 0 && m_MovementSound.isPlaying == false)
-		{
-			m_MovementSound.UnPause();
-		}
-
-		if (playerRigidbody.velocity.magnitude <= 0.1 && m_MovementSound.isPlaying == true)
-		{
-			m_MovementSound.Pause();
-		}
 
 	}
+
 	
 	void Move (float h, float v)
 	{
@@ -60,6 +55,21 @@ public class PlayerMovement : MonoBehaviour {
 		
 		// Move the player to it's current position plus the movement.
 		playerRigidbody.MovePosition (transform.position + movement);
+	}
+
+	void PlayMovementSound (float h, float v)
+	{
+
+		if ((h != 0 || v != 0) && m_MovementSound.isPlaying == false)
+		{
+			m_MovementSound.Play();
+		}
+
+		if ((h == 0 && v == 0) && m_MovementSound.isPlaying == true)
+		{
+			m_MovementSound.Pause();
+		}
+
 	}
 
 	void OnTriggerEnter (Collider other) 
