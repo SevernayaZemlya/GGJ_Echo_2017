@@ -5,9 +5,9 @@ using System.Collections.Generic;
 public class PlayerEcho : MonoBehaviour {
 
 	public Color LIGHT_COLOR = new Color(0.8f, 0.8f, 0.91f, 1.0f);
-	public float LIGHT_RANGE = 20;
-	public float LIGHT_INTENSITY_MAX = 1.0f; 
-	public float PULSE_SPEED = 0.022f;
+	public float LIGHT_RANGE = 30;
+	public float LIGHT_INTENSITY_MAX = 2.0f; 
+	public float PULSE_SPEED = 0.066f;
 	public int PULSE_LIMIT = 3;
 
 	// Collection of echo-location pulse lights
@@ -84,7 +84,7 @@ public class PlayerEcho : MonoBehaviour {
 		lightComp.range = LIGHT_RANGE;
 		lightComp.intensity = 0.001f;
 		lightComp.shadows = LightShadows.Soft;
-		lights.Add(lightComp);
+		lights.Add(echoLight);
 		vals.Add(1); 
 	}
 
