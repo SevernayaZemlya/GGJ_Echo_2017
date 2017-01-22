@@ -97,6 +97,9 @@ public class EnemyMovement : MonoBehaviour {
 
 		else
 		{
+			Transform player_transform = GameObject.FindWithTag("Player").transform; //target the player
+
+			float player_distance = (m_MyLocation.position - player_transform.position).magnitude;
 			//play with delay						
 		}
 
