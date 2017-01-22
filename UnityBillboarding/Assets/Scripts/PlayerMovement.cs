@@ -11,6 +11,8 @@ public class PlayerMovement : MonoBehaviour {
 
 
 	public AudioSource m_MovementSound;
+	public AudioSource m_EatingSound;
+
 	public float framespeed;
 	public Text countText;
 	public Text winText;
@@ -100,18 +102,14 @@ public class PlayerMovement : MonoBehaviour {
 		if (other.gameObject.tag == "Food") 
 		{
 			Destroy(other.gameObject);
-
+			m_EatingSound.Play();
 			count = count + 1;
-
-
-			//other.gameObject.SetActive (false);
-			//play nom sound
-			//
-			//SetCountText ();
 		}
 
 		if (other.gameObject.tag == "Monster")
 		{
+			
+			Die();
 			//SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 		}
 	}
@@ -125,6 +123,11 @@ public class PlayerMovement : MonoBehaviour {
 			winText.text = "You WIN!";
 		}
 
+	}
+
+	void Die()
+	{
+		Application.LoadLevel(Application.loadedLevel);
 	}
 
 }
