@@ -11,17 +11,24 @@ public class PlayerMovement : MonoBehaviour {
 
 
 	public AudioSource m_MovementSound;
-
+	public float framespeed;
 	public Text countText;
 	public Text winText;
 	private int count;
-	
+	private bool isMoving;
+	private Animator animator;
+	private SpriteRenderer spriteRenderer;
+
 	void Awake ()
 	{
 		
 		// Set up references.
 		playerRigidbody = GetComponent <Rigidbody> ();
+		animator = GetComponentInChildren<Animator>();
+		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		animator.speed = framespeed;
 		m_MovementSound.Pause();
+		isMoving = false;
 
 		count = 0;
 		//m_MovementSound.loop = true;
@@ -37,18 +44,11 @@ public class PlayerMovement : MonoBehaviour {
 		// Move the player around the scene.
 		Move (h, v);
 
-
-		if (playerRigidbody.velocity.magnitude > 0 && m_MovementSound.isPlaying == false)
-		{
-			m_MovementSound.UnPause();
-		}
-
-		if (playerRigidbody.velocity.magnitude <= 0.1 && m_MovementSound.isPlaying == true)
-		{
-			m_MovementSound.Pause();
-		}
+		PlayMovementSound(h, v);
+		PlayAnimation(h, v);
 
 	}
+
 	
 	void Move (float h, float v)
 	{
@@ -62,9 +62,42 @@ public class PlayerMovement : MonoBehaviour {
 		playerRigidbody.MovePosition (transform.position + movement);
 	}
 
+	void PlayAnimation (float h, float v) 
+	{
+ 		if (h != 0 || v != 0) {
+ 			animator.speed = 0.5f;
+ 		} else {
+ 			animator.speed = 0f;
+ 		}
+
+        if (h > 0)
+        {
+            spriteRenderer.flipX = true;
+        }
+        else if (h < 0)
+        {
+            spriteRenderer.flipX = false;
+        }
+	}
+
+	void PlayMovementSound (float h, float v)
+	{
+
+		if ((h != 0 || v != 0) && m_MovementSound.isPlaying == false)
+		{
+			m_MovementSound.Play();
+		}
+
+		if ((h == 0 && v == 0) && m_MovementSound.isPlaying == true)
+		{
+			m_MovementSound.Pause();
+		}
+
+	}
+
 	void OnTriggerEnter (Collider other) 
 	{
-		 if (other.gameObject.tag == "Food") 
+		if (other.gameObject.tag == "Food") 
 		{
 			Destroy(other.gameObject);
 
@@ -75,6 +108,11 @@ public class PlayerMovement : MonoBehaviour {
 			//play nom sound
 			//
 			//SetCountText ();
+		}
+
+		if (other.gameObject.tag == "Monster")
+		{
+			//SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 		}
 	}
 

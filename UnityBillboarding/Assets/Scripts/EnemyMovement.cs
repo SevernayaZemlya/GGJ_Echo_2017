@@ -11,8 +11,22 @@ public class EnemyMovement : MonoBehaviour {
 
 	public float m_MoveSpeed = 3.0f;
 	public float m_RotationSpeed = 3.0f;
+	public float m_PulseTimer = 5.0f;
+	private float m_PulseTimerCurrent;
 
-	//public int m_ChaseTimer = 5;
+	// pulse inputs
+	public Color m_PulseColor = new Color(1.0f, 0.7f, 0.7f, 1.0f);
+	public float m_PulseRange = 15f;
+	public float m_PulseIntensityMax = 2.1f; 
+	public float m_PulseSpeed = 0.066f;
+
+
+	GameObject pulse;
+	bool pulseIncreasing;
+
+	public AudioSource m_ChaseMusic;
+	public AudioSource m_EchoMonster;
+
 
 	bool m_PlayerDetected = true;
 	bool m_AtTarget = true;
@@ -20,6 +34,7 @@ public class EnemyMovement : MonoBehaviour {
 	void Awake(){
 
 		m_MyLocation = transform; //cache transform data for easy access/preformance
+		m_PulseTimerCurrent = m_PulseTimer;
     }
 
 
@@ -33,17 +48,31 @@ public class EnemyMovement : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+		Move();
 
-		// if player pings enemy
-		// m_PlayerDetected = true;
-		// attack sound
-		// chase music
-		// start chase timer
+		PlayChaseSound();
 
-		//Pulse function on pulse_timer
+		if (m_PlayerDetected == false)
+		{
+			m_PulseTimerCurrent -= Time.deltaTime;
+		}
 
-		// if chase timer <= 0 and player is hidden
-		// m_PlayerDetected = false;
+		if (m_PulseTimerCurrent <= 0.0f)
+		{
+			Vector3 pos = GameObject.FindWithTag("Monster").transform.position;
+			Pulse(pos);
+			m_PulseTimerCurrent = m_PulseTimer;
+		}
+
+		if (pulse != null) {
+			handlePulse();
+		}	
+
+
+	}
+
+	void Move()
+	{
 
 		if (m_PlayerDetected)
 		{
@@ -65,23 +94,78 @@ public class EnemyMovement : MonoBehaviour {
 
 		if (m_PlayerDetected && m_TargetPosition != null && target_distance < 1)
 		{
-
-			//m_PlayerDetected = false;
+			Vector3 pos = GameObject.FindWithTag("Monster").transform.position;
+			m_PlayerDetected = false;
 			m_AtTarget = true;
+			Pulse(pos);
 		}
-
-
-
 		else 
 		{
 			// sniff around for player
 			// wander around, aimlessly
 		}
-		
+
+
 	}
 
-	void Pulse () {
-		// if enemy pings player
-		// m_PlayerDetected = true;
+	void PlayChaseSound()
+	{
+		if (m_PlayerDetected && !m_ChaseMusic.isPlaying)
+		{
+			m_ChaseMusic.Play();
+		}
+
+		if(!m_PlayerDetected)
+		{
+			m_ChaseMusic.Pause();
+		}
+
 	}
+
+	void Pulse(Vector3 lightLoc) 
+	{
+		m_PlayerDetected = false;
+
+		GameObject mPulse = new GameObject("mPulse");
+		mPulse.transform.position = lightLoc;
+		Light lightComp = mPulse.AddComponent<Light>();
+		lightComp.color = m_PulseColor; 
+		lightComp.range = m_PulseRange;
+		lightComp.intensity = 0.001f;
+		lightComp.shadows = LightShadows.Soft;
+		pulse = mPulse;
+		pulseIncreasing = true;
+		m_EchoMonster.Play();
+
+		// Player detection
+		Collider[] hitColliders = Physics.OverlapSphere(lightLoc, m_PulseRange);
+		Debug.Log("Generating hit sphere");
+		foreach (Collider collider in hitColliders) {
+			if (collider.gameObject.tag == "Player") {
+				Debug.Log("Player detected");
+				m_PlayerDetected = true;
+			}
+		}
+	}
+
+	void handlePulse() {
+		Light li = pulse.GetComponent<Light>();
+		if (pulseIncreasing) {
+			if (li.intensity >= m_PulseIntensityMax) {
+					pulseIncreasing = false;
+				} else {
+					li.intensity += (m_PulseSpeed);
+				}
+		} else {
+			if (li.intensity <= m_PulseSpeed) {
+					Destroy(pulse);
+				} else {
+					li.intensity -= m_PulseSpeed;
+				}
+		}
+	}
+
+
+
+
 }
