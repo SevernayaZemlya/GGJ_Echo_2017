@@ -7,10 +7,12 @@ public class EnemyMovement : MonoBehaviour {
 
 	//Transform m_Target;
 	Vector3 m_TargetPosition;
+	Vector3 m_StartPosition;
 	Transform m_MyLocation;
 
 	public float m_MoveSpeed = 3.0f;
 	public float m_RotationSpeed = 3.0f;
+	public float m_RoamRadius = 30.0f;
 	public float m_PulseTimer = 5.0f;
 	private float m_PulseTimerCurrent;
 	private Animator animator;
@@ -34,6 +36,9 @@ public class EnemyMovement : MonoBehaviour {
 	bool m_PlayerDetected = true;
 	bool m_AtTarget = true;
 
+	bool m_FreeRoam = true;
+	Vector3 random_direction;
+
 	void Awake(){
 
 		m_MyLocation = transform; //cache transform data for easy access/preformance
@@ -42,6 +47,7 @@ public class EnemyMovement : MonoBehaviour {
 		animator = GetComponentInChildren<Animator>();
 		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		rigidBody = GetComponent<Rigidbody>();
+		m_StartPosition = m_MyLocation.position;
     }
 
 
@@ -100,6 +106,7 @@ public class EnemyMovement : MonoBehaviour {
 	void Move()
 	{
 
+		
 		if (m_PlayerDetected)
 		{
 			
@@ -125,13 +132,36 @@ public class EnemyMovement : MonoBehaviour {
 			m_AtTarget = true;
 			Pulse(pos);
 		}
-		else 
+		if (! m_PlayerDetected) 
 		{
-			// sniff around for player
-			// wander around, aimlessly
+			//FreeRoam();
+		}
+
+		if (!m_FreeRoam && (m_MyLocation.position - m_TargetPosition).magnitude < 1)
+		{
+			m_FreeRoam = true;
 		}
 
 
+	}
+
+	void FreeRoam()
+	{
+		if (m_FreeRoam)
+		{
+
+		random_direction = Random.insideUnitCircle * m_RoamRadius;
+		random_direction += m_StartPosition;
+		random_direction.y = m_StartPosition.y;	
+		m_FreeRoam = false;
+
+		}
+
+		Quaternion rot_from = m_MyLocation.rotation;
+		Quaternion rot_to = Quaternion.LookRotation(random_direction - m_MyLocation.position);
+
+		m_MyLocation.rotation = Quaternion.Slerp(rot_from, rot_to, m_RotationSpeed*Time.deltaTime); // rotate to face random
+		m_MyLocation.position += m_MyLocation.forward * m_MoveSpeed * Time.deltaTime; // move towards random
 	}
 
 	void PlayChaseSound()
@@ -145,7 +175,6 @@ public class EnemyMovement : MonoBehaviour {
 		{
 			m_ChaseMusic.Pause();
 		}
-
 	}
 
 	void Pulse(Vector3 lightLoc) 
