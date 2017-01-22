@@ -11,17 +11,22 @@ public class PlayerMovement : MonoBehaviour {
 
 
 	public AudioSource m_MovementSound;
-
+	public float framespeed;
 	public Text countText;
 	public Text winText;
 	private int count;
 	private bool isMoving;
-	
+	private Animator animator;
+	private SpriteRenderer spriteRenderer;
+
 	void Awake ()
 	{
 		
 		// Set up references.
 		playerRigidbody = GetComponent <Rigidbody> ();
+		animator = GetComponentInChildren<Animator>();
+		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		animator.speed = framespeed;
 		m_MovementSound.Pause();
 		isMoving = false;
 
@@ -40,7 +45,7 @@ public class PlayerMovement : MonoBehaviour {
 		Move (h, v);
 
 		PlayMovementSound(h, v);
-
+		PlayAnimation(h, v);
 
 	}
 
@@ -55,6 +60,24 @@ public class PlayerMovement : MonoBehaviour {
 		
 		// Move the player to it's current position plus the movement.
 		playerRigidbody.MovePosition (transform.position + movement);
+	}
+
+	void PlayAnimation (float h, float v) 
+	{
+ 		if (h != 0 || v != 0) {
+ 			animator.speed = 0.5f;
+ 		} else {
+ 			animator.speed = 0f;
+ 		}
+
+        if (h > 0)
+        {
+            spriteRenderer.flipX = true;
+        }
+        else if (h < 0)
+        {
+            spriteRenderer.flipX = false;
+        }
 	}
 
 	void PlayMovementSound (float h, float v)
@@ -74,7 +97,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	void OnTriggerEnter (Collider other) 
 	{
-		 if (other.gameObject.tag == "Food") 
+		if (other.gameObject.tag == "Food") 
 		{
 			Destroy(other.gameObject);
 
@@ -85,6 +108,11 @@ public class PlayerMovement : MonoBehaviour {
 			//play nom sound
 			//
 			//SetCountText ();
+		}
+
+		if (other.gameObject.tag == "Monster")
+		{
+			//SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 		}
 	}
 
