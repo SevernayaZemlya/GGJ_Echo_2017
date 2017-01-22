@@ -5,12 +5,13 @@ using System.Collections.Generic;
 public class PlayerEcho : MonoBehaviour {
 
 	public Color LIGHT_COLOR = new Color(0.8f, 0.8f, 0.91f, 1.0f);
-	public const float LIGHT_RANGE = 20;
-	public const float PULSE_SPEED = 0.022f;
-	public const int PULSE_LIMIT = 3;
+	public float LIGHT_RANGE = 20;
+	public float LIGHT_INTENSITY_MAX = 1.0f; 
+	public float PULSE_SPEED = 0.022f;
+	public int PULSE_LIMIT = 3;
 
 	// Collection of echo-location pulse lights
-	List<Light> lights = new List<Light>();
+	List<GameObject> lights = new List<GameObject>();
 	List<int> vals = new List<int>();
 	// index of a val in vals matches a light in lights 
 	// tracks increasing (1) or decreasing (-1) intensity
@@ -26,12 +27,12 @@ public class PlayerEcho : MonoBehaviour {
 
 		// pulse lights (foreach light)
 		for (int i=0; i<lights.Count; i++) {
-			Light lgt = lights[i];
+			Light lgt = lights[i].GetComponent<Light>();
 			int val = vals[i];
 
 			if (val == 1) { 
 			// intensity increasing
-				if (lgt.intensity >= 1.0f) {
+				if (lgt.intensity >= LIGHT_INTENSITY_MAX) {
 					vals[i] = -1;
 				} else {
 					lgt.intensity += (PULSE_SPEED * val);
@@ -57,7 +58,9 @@ public class PlayerEcho : MonoBehaviour {
 		if (lights.Count > PULSE_LIMIT) return false;
 		if (lights.Count > 0) {
 			// most recently spawned light was created too recently
-			if (lights[lights.Count - 1].intensity < 0.25f && vals[lights.Count - 1] == 1) {
+			float intensityThreshhold = LIGHT_INTENSITY_MAX * 0.25f;
+			if (lights[lights.Count - 1].GetComponent<Light>().intensity < intensityThreshhold 
+				&& vals[lights.Count - 1] == 1) {
 				return false;
 			}
 		}
@@ -66,7 +69,7 @@ public class PlayerEcho : MonoBehaviour {
 
 	void cleanUp(int toDel) {
 		// Removes light from lights and destroys light object
-		Light light = lights[toDel];
+		GameObject light = lights[toDel];
 		vals.RemoveAt(toDel);
 		lights.RemoveAt(toDel);
 		Destroy(light);
@@ -79,7 +82,7 @@ public class PlayerEcho : MonoBehaviour {
 		Light lightComp = echoLight.AddComponent<Light>();
 		lightComp.color = LIGHT_COLOR; 
 		lightComp.range = LIGHT_RANGE;
-		lightComp.intensity = 0.01f;
+		lightComp.intensity = 0.001f;
 		lightComp.shadows = LightShadows.Soft;
 		lights.Add(lightComp);
 		vals.Add(1); 
