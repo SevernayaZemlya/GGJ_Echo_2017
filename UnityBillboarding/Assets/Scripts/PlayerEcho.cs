@@ -10,6 +10,11 @@ public class PlayerEcho : MonoBehaviour {
 	public float PULSE_SPEED = 0.066f;
 	public int PULSE_LIMIT = 3;
 
+	public AudioSource Echo_Location_01;
+	public AudioSource Echo_Location_02;
+	public AudioSource Echo_Location_03;
+	private int lastPlayed = 0;
+
 	// Collection of echo-location pulse lights
 	List<GameObject> lights = new List<GameObject>();
 	List<int> vals = new List<int>();
@@ -85,7 +90,26 @@ public class PlayerEcho : MonoBehaviour {
 		lightComp.intensity = 0.001f;
 		lightComp.shadows = LightShadows.Soft;
 		lights.Add(echoLight);
+		playPulseSound();
 		vals.Add(1); 
+	}
+
+	void playPulseSound() {
+		if (lastPlayed == 2) {
+			Echo_Location_01.Play();
+			lastPlayed = 0;
+			return;
+		}
+		if (lastPlayed == 0) {
+			Echo_Location_02.Play();
+			lastPlayed = 1;
+			return;
+		}
+		if (lastPlayed == 1) {
+			Echo_Location_03.Play();
+			lastPlayed = 2;
+			return;
+		}
 	}
 
 
