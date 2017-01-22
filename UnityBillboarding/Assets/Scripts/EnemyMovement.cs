@@ -14,6 +14,16 @@ public class EnemyMovement : MonoBehaviour {
 	public float m_PulseTimer = 5.0f;
 	private float m_PulseTimerCurrent;
 
+	// pulse inputs
+	public Color m_PulseColor = new Color(1.0f, 0.7f, 0.7f, 1.0f);
+	public float m_PulseRange = 15f;
+	public float m_PulseIntensityMax = 2.1f; 
+	public float m_PulseSpeed = 0.066f;
+
+
+	GameObject pulse;
+	bool pulseIncreasing;
+
 	public AudioSource m_ChaseMusic;
 	public AudioSource m_EchoMonster;
 
@@ -49,10 +59,16 @@ public class EnemyMovement : MonoBehaviour {
 
 		if (m_PulseTimerCurrent <= 0.0f)
 		{
-			Pulse();
+			Vector3 pos = GameObject.FindWithTag("Monster").transform.position;
+			Pulse(pos);
 			m_PulseTimerCurrent = m_PulseTimer;
 		}
-		
+
+		if (pulse != null) {
+			handlePulse();
+		}	
+
+
 	}
 
 	void Move()
@@ -78,10 +94,10 @@ public class EnemyMovement : MonoBehaviour {
 
 		if (m_PlayerDetected && m_TargetPosition != null && target_distance < 1)
 		{
-
+			Vector3 pos = GameObject.FindWithTag("Monster").transform.position;
 			m_PlayerDetected = false;
 			m_AtTarget = true;
-			Pulse();
+			Pulse(pos);
 		}
 		else 
 		{
@@ -106,14 +122,47 @@ public class EnemyMovement : MonoBehaviour {
 
 	}
 
-	void Pulse () 
+	void Pulse(Vector3 lightLoc) 
 	{
 		m_PlayerDetected = false;
 
-		// Pulse effects
-		// Pulse sound
-		// if enemy pings player
-		// then m_PlayerDetected = true;
+		GameObject mPulse = new GameObject("mPulse");
+		mPulse.transform.position = lightLoc;
+		Light lightComp = mPulse.AddComponent<Light>();
+		lightComp.color = m_PulseColor; 
+		lightComp.range = m_PulseRange;
+		lightComp.intensity = 0.001f;
+		lightComp.shadows = LightShadows.Soft;
+		pulse = mPulse;
+		pulseIncreasing = true;
+		m_EchoMonster.Play();
+
+		// Player detection
+		Collider[] hitColliders = Physics.OverlapSphere(lightLoc, m_PulseRange);
+		Debug.Log("Generating hit sphere");
+		foreach (Collider collider in hitColliders) {
+			if (collider.gameObject.tag == "Player") {
+				Debug.Log("Player detected");
+				m_PlayerDetected = true;
+			}
+		}
+	}
+
+	void handlePulse() {
+		Light li = pulse.GetComponent<Light>();
+		if (pulseIncreasing) {
+			if (li.intensity >= m_PulseIntensityMax) {
+					pulseIncreasing = false;
+				} else {
+					li.intensity += (m_PulseSpeed);
+				}
+		} else {
+			if (li.intensity <= m_PulseSpeed) {
+					Destroy(pulse);
+				} else {
+					li.intensity -= m_PulseSpeed;
+				}
+		}
 	}
 
 
