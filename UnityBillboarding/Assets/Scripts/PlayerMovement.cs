@@ -11,7 +11,6 @@ public class PlayerMovement : MonoBehaviour {
 
 
 	public AudioSource m_MovementSound;
-	public float framespeed;
 	public Text countText;
 	public Text winText;
 	private int count;
@@ -26,7 +25,6 @@ public class PlayerMovement : MonoBehaviour {
 		playerRigidbody = GetComponent <Rigidbody> ();
 		animator = GetComponentInChildren<Animator>();
 		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-		animator.speed = framespeed;
 		m_MovementSound.Pause();
 		isMoving = false;
 

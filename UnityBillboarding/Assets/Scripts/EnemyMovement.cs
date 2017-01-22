@@ -13,7 +13,10 @@ public class EnemyMovement : MonoBehaviour {
 	public float m_RotationSpeed = 3.0f;
 	public float m_PulseTimer = 5.0f;
 	private float m_PulseTimerCurrent;
-
+	private Animator animator;
+	private SpriteRenderer spriteRenderer;
+	private Rigidbody rigidBody;
+	private double prev_x;
 	// pulse inputs
 	public Color m_PulseColor = new Color(1.0f, 0.7f, 0.7f, 1.0f);
 	public float m_PulseRange = 15f;
@@ -35,12 +38,16 @@ public class EnemyMovement : MonoBehaviour {
 
 		m_MyLocation = transform; //cache transform data for easy access/preformance
 		m_PulseTimerCurrent = m_PulseTimer;
+
+		animator = GetComponentInChildren<Animator>();
+		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		rigidBody = GetComponent<Rigidbody>();
     }
 
 
 	// Use this for initialization
 	void Start () {
-
+		prev_x = transform.position.x;
 		//m_Target = GameObject.FindWithTag("Player").transform; //target the player
 
 	}
@@ -49,7 +56,7 @@ public class EnemyMovement : MonoBehaviour {
 	void Update () {
 		
 		Move();
-
+		PlayAnimation();
 		PlayChaseSound();
 
 		if (m_PlayerDetected == false)
@@ -69,6 +76,25 @@ public class EnemyMovement : MonoBehaviour {
 		}	
 
 
+	}
+
+	void PlayAnimation () 
+	{
+		animator.speed = 0.1f;
+		/*
+ 		if (rigidBody.velocity.x > 1) {
+ 			spriteRenderer.flipX = false;
+ 		} else if (rigidBody.velocity.x < -1) {
+ 			spriteRenderer.flipX = true;
+ 		}*/
+
+ 		if (prev_x < transform.position.x) {
+ 			spriteRenderer.flipX = false;
+ 		} else if (prev_x > transform.position.x) {
+ 			spriteRenderer.flipX = true;
+ 		}
+
+ 		prev_x = transform.position.x;
 	}
 
 	void Move()
