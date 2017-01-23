@@ -33,7 +33,7 @@ public class EnemyMovement : MonoBehaviour {
 	public AudioSource m_EchoMonster;
 
 
-	bool m_PlayerDetected = true;
+	bool m_PlayerDetected = false;
 	bool m_AtTarget = true;
 
 	bool m_FreeRoam = true;
@@ -43,10 +43,6 @@ public class EnemyMovement : MonoBehaviour {
 
 		m_MyLocation = transform; //cache transform data for easy access/preformance
 		m_PulseTimerCurrent = m_PulseTimer;
-
-		animator = GetComponentInChildren<Animator>();
-		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-		rigidBody = GetComponent<Rigidbody>();
 		m_StartPosition = m_MyLocation.position;
     }
 
@@ -54,6 +50,10 @@ public class EnemyMovement : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		prev_x = transform.position.x;
+
+		animator = GetComponentInChildren<Animator>();
+		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		rigidBody = GetComponent<Rigidbody>();
 		//m_Target = GameObject.FindWithTag("Player").transform; //target the player
 
 	}
@@ -95,9 +95,9 @@ public class EnemyMovement : MonoBehaviour {
  		}*/
 
  		if (prev_x < transform.position.x) {
- 			spriteRenderer.flipX = false;
- 		} else if (prev_x > transform.position.x) {
  			spriteRenderer.flipX = true;
+ 		} else if (prev_x > transform.position.x) {
+ 			spriteRenderer.flipX = false;
  		}
 
  		prev_x = transform.position.x;
